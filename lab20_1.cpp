@@ -20,21 +20,78 @@ string toUpperStr(string x){
     return y;
 }
 
-void importDataFromFile(){
-
+void importDataFromFile(const string& filename, vector<string>& names, vector<int>& scores, vector<char>& grades){
+    ifstream file(filename);
+    if(file.is_open()){
+        string line;
+        while(getline(file, line)){
+            unsigned int pos = line.find(":");
+            if (pos != string::npos && pos > 0 && pos < line.length() - 1) {
+                string name = line.substr(0, pos);
+                names.push_back(name);
+                string scoreStr = line.substr(pos + 1);
+                size_t space_pos;
+                int scoreSum = 0;
+                while ((space_pos = scoreStr.find(" ")) != string::npos) {
+                    string numStr = scoreStr.substr(0, space_pos);
+                    int score = atoi(numStr.c_str());
+                    scoreSum += score;
+                    scoreStr = scoreStr.substr(space_pos + 1);
+                }
+                if (!scoreStr.empty()) {
+                    int score = atoi(scoreStr.c_str());
+                    scoreSum += score;
+                }
+                char grade = score2grade(scoreSum);
+                scores.push_back(scoreSum); 
+                grades.push_back(grade);
+            }
+        }
+        file.close();
+    }
 }
 
-void getCommand(){
+void getCommand(string &command, string &key){
+    cout << "Please input your command: ";
+    cin >> command;
+    if(toUpperStr(command) == "GRADE" or toUpperStr(command) == "EXIT" or toUpperStr(command) == "NAME"){
+        cin.ignore();
+        getline(cin,key);
 
+    }
 }
 
-void searchName(){
-
+void searchName(const vector<string>& names, const vector<int>& scores, const vector<char>& grades, const string& key){
+    bool found = false;
+    cout << "---------------------------------\n";
+    for(size_t i = 0; i < names.size(); i++){
+        if(toUpperStr(names[i]) == key){
+            found = true;
+            cout << names[i] << "'s score = " << scores[i] << endl;
+            cout << names[i] << "'s grade = " << grades[i] << endl;
+        }
+    }
+    if(found==false){
+        cout << "Cannot found.\n";
+    }
+    cout << "---------------------------------\n";
 }
 
-void searchGrade(){
-
+void searchGrade(const vector<string>& names, const vector<int>& scores, const vector<char>& grades, const string& key){
+    bool found = false;
+    cout << "---------------------------------\n";
+    for(size_t i = 0; i < grades.size(); i++){
+        if(toupper(grades[i]) == toupper(key.at(0))){
+            found = true;
+            cout << names[i] << " (" << scores[i] << ")\n";
+        }
+    }
+    if(found == false){;
+        cout << "Cannot found.\n";
+    }
+    cout << "---------------------------------\n";
 }
+
 
 
 int main(){
